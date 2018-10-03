@@ -1,5 +1,6 @@
 #ifndef _F9CCH_
 #define _F9CCH_
+
 /****************************************************************************/
 /*																			*/
 /*																			*/
@@ -34,36 +35,111 @@
 #define	LEXSEMI		20		/* Semicolon									*/
 #define	LEXCOMMA	21		/* Comma										*/
 #define	LEXSTR		22		/* Strings										*/
-#define	LEXEOF		23		/* End of file									 */
+#define	LEXEOF		23		/* End of file									*/
+
+/* Declarations for the FSM */
+
+#include "fsm-defs"
+
+/* Definition of character range */
+
+#define	CHAR_RANGE		257		/* Range of character values: 0 to 255	*/
+								/* 	plus one for "EOF"					*/
+#define	EOF_CHAR		256
+#define	TAB				6
+#define	NEWLINE			12
+#define	BLANK			32
+
+/* FSM actions */
+
+#define	FSM_ACT_SKIP	0	/* Skip this character (no action)			*/
+#define	FSM_ACT_SAVE	1	/* Save the current character				*/
+#define	FSM_ACT_APP		2	/* Append the current character to the		*/
+							/*	saved characters						*/
+#define	FSM_ACT_RET		3	/* Have reached the end of a token, so		*/
+							/*	return (convert string to				*/
+							/*	integer value if LEXNUM)				*/
+#define	FSM_ACT_SRET	4	/* Save and return.  Used with single-		*/
+							/*	character token, such as comma			*/
+#define	FSM_ACT_ERR		5	/* Invalid combination of state and			*/
+							/*	input character							*/
 
 /* Globals shared by lexical analyzer and parser */
-#define	MAXTOK		256
 
-typedef	struct	tok {		/* A token as returned by the lexical analyzer	*/
+#define	MAXTOK		1024	/* Maximum size of a token (possibly a string)	*/
+#define	MAXVAR		24		/* Maximum variable name length					*/
+#define	MAXINT		0x7fffffff  /* Maximum positive integer					*/
+#define	MAXARGS		200		/* Maximum arguments to a function				*/
+
+/****************************/
+/*							*/
+/*		Structures			*/
+/*							*/
+/****************************/
+
+struct	tok {				/* A token as returned by the lexical analyzer	*/
 	int		tok_typ;		/* One of the types defined above				*/
 	char	tok_str[MAXTOK];/* The actual string							*/
 	int		tok_val;		/* Value of the token is a number				*/
-} tok_f9;
+};
 
-typedef	struct	Command {
+struct	command {
 	FILE	*inputFile;		/* Input file									*/
 	FILE	*outputFile; 	/* Output file									*/
-} command_f9;
+};
 
-extern	tok_f9 nexttok;		/* The next input token							*/
+struct	position {			/* Position of the next character				*/
+	int		row;
+	int		col;
+};
 
-extern command_f9 cmd;		/* The command									*/
+struct	keyentry {          /* Keyword table                                */
+	char	*keyword;		/* A keyword in the language			        */
+	int		lextype;		/* The lexical type for the keyword		        */
+};
 
+struct	fsmentry {          /* FSM Entry                                    */
+	int	fsm_nextst;			/* Next state								    */
+	int	fsm_action;			/* Action for this transition				    */
+	int	fsm_lextyp;			/* For FSM_RET, the token type to return	    */
+};
 
-// lex.c
+/****************************/
+/*							*/
+/*		Variables			*/
+/*							*/
+/****************************/
+
+extern	struct tok		nexttok;		/* The next input token				*/
+
+extern	struct command	cmd;			/* Data from command input			*/
+
+extern	char			nextchar;		/* The next read character			*/
+
+extern	struct position	pos;			/* Postion for the nextchar			*/
+
+extern  struct fsmentry fsm[STATES][CHAR_RANGE];
+
+extern  struct keyentry ktab[8];
+
+/****************************/
+/*							*/
+/*		Functions			*/
+/*							*/
+/****************************/
+
+/* in file main.c */
+extern	void	errmsg(char *);
+
+/* in file lex.c */
 extern	void	lexinit(void);
 
 extern	void	gettoken(void);
 
+/* in file file.c */
 extern	void	getch(void);
 
-extern	char	nextchar;
-
 // extern	int	symlookup(char *);
+
 #endif
 
