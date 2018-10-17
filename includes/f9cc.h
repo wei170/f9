@@ -10,6 +10,7 @@
 /****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Lexical token types */
 
@@ -138,6 +139,9 @@ extern	void	gettoken(void);
 
 /* in file file.c */
 extern	void	getch(void);
+
+/* in file parser.c */
+extern	void	parser(void);
 
 // extern	int	symlookup(char *);
 

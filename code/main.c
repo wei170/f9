@@ -1,18 +1,16 @@
 /**
  * Main
  */
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
 #include <f9cc.h>
+#include <unistd.h>
+#include <string.h>
 
 struct command	cmd;
 char			nextchar;
 
 static void usage(int exitcode) {
 		fprintf(exitcode ? stderr : stdout,
-			"Usage: f9cc [ -o ] <file>\n\n"
+			"Usage: f9cc [ -o ] <file>\n"
 			"\n"
 			"  -o filename        Output to the specified file\n"
 			"\n");
@@ -22,18 +20,19 @@ static void usage(int exitcode) {
 static void parseOpt(int argc, char **argv) {
 	for (;;) {
 		int opt = getopt(argc, argv, "o");
-		switch(opt)
-		{
+		if (opt == -1) break;
+		switch(opt) {
 			case 'o':
 				cmd.outputFile = fopen(optarg, "w");
 				break;
-			default: usage(1);
+			default:
+				usage(1);
 		}
 	}
 
-	if (optind != argc - 1) usage(1);
+	if (optind != argc - 2) usage(1);
 
-	cmd.inputFile = fopen(argv[optind], "r");
+	cmd.inputFile = fopen(argv[optind+1], "r");
 	if (cmd.inputFile == NULL) {
 		fprintf(stderr, "%s does not exist.\n", argv[optind]);
 		exit(1);
@@ -55,6 +54,6 @@ void    errmsg(char *msg) {
 
 int main(int argc, char **argv) {
 	parseOpt(argc, argv);
-	lexinit();
+	parser();
 }
 

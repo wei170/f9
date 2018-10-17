@@ -2,18 +2,29 @@ Grammer
 
 Rules
 
+Program:
 program		->	gm_pgm		'LEXEOF'
-gm_pgm		->	'LEXPRG'	gm_decls		gm_stmts
-gm_decls	->	[ 'LEXTYPE'	'LEXNAME'		[ ',', 'LEXNAME' ]*  ]*
-gm_stmts	->	gm_stmt		[ gm_stmt ]*
-gm_stmt		->	'LEXIF'		gm_ifbody		|
-				'LEXWHILE'	gm_whilebody
-				...
+gm_pgm		->	'LEXPRG'	'LEXLB'			gm_decls	gm_stmts	'LEXRB'
+gm_decls	->	[ 'LEXTYPE'	'LEXID'			[ ',', 'LEXID' ]*  ]*
 
+Statements:
+gm_stmts	->	gm_stmt		[ gm_stmt ]*
+gm_stmt		->	gm_if		|
+				gm_while	|
+				gm_fnc	 	|
+				gm_idop		"LEXSEMI"
+gm_if		->	'LEXIF'		gm_expr		"LEXLB"		gm_stmts	"LEXRB"
+				[ gm_else ]
+gm_else		->	'LEXELSE'	"LEXLB"		gm_stmts	"LEXRB"
+gm_while	->	'LEXWHILE'	gm_expr		"LEXLB"		gm_stmts	"LEXRB"
+gm_fnc		->	'LEXFNC'	gm_expr
+gm_idop		->	"LEXID"		gm_ari
+
+Expressions:
 gm_expr		->	gm_cmp		[ 'LEXLOGOP'	gm_cmp ]*
 gm_cmp		->	gm_ari		[ 'LEXCMPOP'	gm_ari ]*
 gm_ari		->	gm_term		[ 'LEXARIOP'	gm_term ]*
-gm_term		->	'LEXNAME'	|
+gm_term		->	'LEXID'		|
 				'LEXTYPE'	|
 				'LEXLP'		gm_expr		'LEXRP'
 
