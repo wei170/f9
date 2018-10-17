@@ -1,3 +1,4 @@
 ./code/fsm-code
 ./includes/fsm-defs
 ./compile/binaries/*
+./compile/f9cc
