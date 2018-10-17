@@ -1,8 +1,4 @@
 #!/bin/zsh
-
-FSM_DEFS=../includes/fsm-defs
-FSM_CODE=../code/fsm-code
-
 case $# in
 	0)	FILE=
 		;;
@@ -16,6 +12,9 @@ case $# in
 		exit 1
 		;;
 esac
+
+FSM_DEFS=fsm-defs
+FSM_CODE=fsm-code
 
 Q="'"
 # sed 's/	*/	/g' |
@@ -125,8 +124,7 @@ BEGIN {
 END {
 	printf("#define STATES\t\t\t\t\t%d\n", states);
 }
-' 1>$FSM_CODE
-# Redirect output to the fsm-code file
+'
 
 grep "#define" $FSM_CODE > $FSM_DEFS
 grep -v "#define" $FSM_CODE > fsm-code.bak && mv fsm-code.bak $FSM_CODE

@@ -1,0 +1,19 @@
+Grammer
+
+Rules
+
+program		->	gm_pgm		'LEXEOF'
+gm_pgm		->	'LEXPRG'	gm_decls		gm_stmts
+gm_decls	->	[ 'LEXTYPE'	'LEXNAME'		[ ',', 'LEXNAME' ]*  ]*
+gm_stmts	->	gm_stmt		[ gm_stmt ]*
+gm_stmt		->	'LEXIF'		gm_ifbody		|
+				'LEXWHILE'	gm_whilebody
+				...
+
+gm_expr		->	gm_cmp		[ 'LEXLOGOP'	gm_cmp ]*
+gm_cmp		->	gm_ari		[ 'LEXCMPOP'	gm_ari ]*
+gm_ari		->	gm_term		[ 'LEXARIOP'	gm_term ]*
+gm_term		->	'LEXNAME'	|
+				'LEXTYPE'	|
+				'LEXLP'		gm_expr		'LEXRP'
+

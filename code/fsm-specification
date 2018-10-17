@@ -1,0 +1,203 @@
+INIT
+
+	/* Initial state */
+
+	any			INIT			ERR			LEXUNUSED
+
+	/* Whitespace */
+
+	BLANK		INIT			SKIP		LEXUNUSED
+	TAB			INIT			SKIP		LEXUNUSED
+	NEWLINE		INIT			SKIP		LEXUNUSED
+
+	/* End of file */
+
+	EOF_CHAR	INIT			RET			LEXEOF
+
+	/* Slash - possible start of a comment */
+
+	'/'			SLASH			SAVE		LEXUNUSED
+
+	/* Letters - ID or KEYWORD */
+
+	'-'			NAME			SAVE		LEXUNUSED
+	a-z			NAME			SAVE		LEXUNUSED
+	A-Z			NAME			SAVE		LEXUNUSED
+
+	/* Numbers - start of numeric constant */
+
+	'0'			ZERO			SAVE		LEXUNUSED
+	1-9			DECNUM			SAVE		LEXUNUSED
+
+	/* Special characters (){};, */
+
+	'('			INIT			SRET		LEXLP
+	')'			INIT			SRET		LEXRP
+	'{'			INIT			SRET		LEXLB
+	'}'			INIT			SRET		LEXRB
+	';'			INIT			SRET		LEXSEMI
+	','			INIT			SRET		LEXCOMMA
+
+	/* Comaprison */
+
+	'<'			CMP				SAVE		LEXUNUSED
+	'>'			CMP				SAVE		LEXUNUSED
+	'!'			CMP				SAVE		LEXUNUSED
+	'='			EQU				SAVE		LEXUNUSED
+
+	/* Arithmetic operations */
+
+	'+'			ADD				SAVE		LEXUNUSED
+	'-'			ADD				SAVE		LEXUNUSED
+	'*'			MUL				SAVE		LEXUNUSED
+
+	/*  Logical connectors */
+
+	'&'			LOG_AND			SAVE		LEXUNUSED
+	'|'			LOG_OR			SAVE		LEXUNUSED
+
+	/* Quote - string*/
+	
+	'"'			STR				SAVE		LEXUNUSED
+
+SLASH
+
+	/* Starting with a slash */
+
+	any			INIT			RET			LEXUNUSED
+	'='			ARIEQU			APP			LEXARIOP
+	'*'			INCMT			SKIP		LEXUNUSED
+	'/'			LINECMT			SKIP		LEXUNUSED
+
+INCMT
+
+	/* Comments beginning with slash star */
+
+	any			INCMT			SKIP		LEXUNUSED
+	'*'			STARTINCMT		SKIP		LEXUNUSED
+
+STARTINCMT
+
+	/* Have seen a start in a comment */
+
+	any			INCMT			SKIP		LEXUNUSED
+	'*'			STARTINCMT		SKIP		LEXUNUSED
+	'/'			INIT			SKIP		LEXUNUSED
+
+LINECMT
+
+	/* Single line comment */
+
+	any			LINECMT			SKIP		LEXUNUSED
+	NEWLINE		INIT			SKIP		LEXUNUSED
+
+ZERO
+
+	/* Have seen a zero */
+
+	any			INIT			RET			LEXNUM
+	'x'			HEXNUM			APP			LEXNUM
+	0-9			DECNUM			APP			LEXNUM
+
+DECNUM
+
+	/* In a decimal number */
+
+	any			INIT			RET			LEXNUM
+	0-9			DECNUM			APP			LEXNUM
+
+HEXNUM
+
+	/* In a hexadeximal number */
+
+	any			INIT			RET			LEXNUM
+	0-9			HEXNUM			APP			LEXNUM
+	a-f			HEXNUM			APP			LEXNUM
+	A-F			HEXNUM			APP			LEXNUM
+
+CMP
+
+	/* Have seen a comparison operator */
+
+	any			INIT			RET			LEXCMPOP
+	'='			CMPEQU			APP			LEXUNUSED
+
+EQU
+
+	/* Have seen an equal sign */
+
+	any			INIT			RET			LEXARIOP
+	'='			CMPEQU			APP			LEXUNUSED
+
+CMPEQU
+
+	/* Last state for <=, >=, == */
+
+	any			INIT			RET			LEXCMPOP
+
+ADD
+
+	/* Have seen + or - */
+
+	any			INIT			RET			LEXARIOP
+	'='			ARIEQU			APP			LEXUNUSED
+
+MUL
+
+	/* Have seen * or - */
+
+	any			INIT			RET			LEXARIOP
+	'='			ARIEQU			APP			LEXUNUSED
+
+ARIEQU
+
+	/* Last state for +=, -=, *=, /= */
+
+	any			INIT			RET			LEXARIOP
+
+NAME
+
+	/* Have seen a letter */
+
+	any			INIT			RET			LEXNAME
+	'-'			NAME			APP			LEXNAME
+	a-z			NAME			APP			LEXNAME
+	A-Z			NAME			APP			LEXNAME
+	0-9			NAME			APP			LEXNAME
+
+LOG_OR
+
+	/* Have seen | */
+
+	any			INIT			ERR			LEXUNUSED
+	'|'			LOG				APP			LEXUNUSED
+
+LOG_AND
+
+	/* Have seen & */
+
+	any			INIT			ERR			LEXUNUSED
+	'&'			LOG				APP			LEXUNUSED
+
+LOG
+
+	/* Last state for || or && */
+
+	any			INIT			RET			LEXLOGOP
+
+STR
+
+	/* Have seen a double quote */
+
+	any			STR				APP			LEXUNUSED
+	'\\'		STRESC			APP			LEXUNUSED
+	'"'			INIT			RET			LEXSTR
+	NEWLINE		INIT			ERR			LEXUNUSED
+	'\0'		INIT			ERR			LEXUNUSED
+
+STRESC
+
+	/* Have seen the backslash escape in a string */
+
+	any			STR				APP			LEXUNUSED
+

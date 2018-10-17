@@ -31,7 +31,7 @@
 #define	LEXRB		16      /* Right Brace									*/
 #define	LEXCMPOP	17		/* Camparison operation							*/
 #define	LEXARIOP	18		/* Arithmetic operation							*/
-#define	LEXLOG		19		/* Logic										*/
+#define	LEXLOGOP	19		/* Logic operation								*/
 #define	LEXSEMI		20		/* Semicolon									*/
 #define	LEXCOMMA	21		/* Comma										*/
 #define	LEXSTR		22		/* Strings										*/
