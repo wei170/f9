@@ -1,2 +1,3 @@
 ./code/fsm-code
 ./includes/fsm-defs
+./compile/binaries/*
