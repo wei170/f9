@@ -5,7 +5,7 @@ CODEDIR		=		../code
 INCDIR		= 		../includes
 GENDIR      =       ../gen
 
-$(PROGRAM): main.o lex.o file.o
+$(PROGRAM): genfsm main.o lex.o file.o
 	    gcc $(FLAGS) $(BINDIR)/*.o -o $(PROGRAM)
 
 main.o:     $(INCDIR)/f9cc.h $(CODEDIR)/main.c
@@ -17,8 +17,8 @@ lex.o:      $(INCDIR)/f9cc.h $(CODEDIR)/lex.c
 file.o:     $(INCDIR)/f9cc.h $(CODEDIR)/file.c
 	    gcc $(FLAGS) -I$(INCDIR) -c $(CODEDIR)/file.c -o $(BINDIR)/file.o
 
-#genfsm:     $(GENDIR)/genfsm
-		#@./genfsm
+genfsm:     $(GENDIR)/genfsm
+		$(GENDIR)/genfsm $(CODEDIR)/fsm-specification
 
 clean:
 	    rm -f $(BINDIR)/*.o $(PROGRAM)
