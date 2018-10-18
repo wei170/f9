@@ -7,7 +7,7 @@ void getch(void) {
 	/* Check opened input file */
 
 	if (cmd.inputFile == NULL) return;
-	
+
     /* Update the position if hit a newline */
 
 	if (nextchar == NEWLINE) {
@@ -17,11 +17,12 @@ void getch(void) {
 
     /* Read the next character */
 
-	if (fread(&nextchar, 1, 1, cmd.inputFile) == EOF) {
+	nextchar = fgetc(cmd.inputFile);
+	if (nextchar == EOF) {
         nextchar = EOF_CHAR;
+		fclose(cmd.inputFile);
     } else {
         pos.col++;
     }
-
 }
 

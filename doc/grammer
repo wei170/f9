@@ -12,13 +12,15 @@ gm_stmts	->	gm_stmt		[ gm_stmt ]*
 gm_stmt		->	gm_if		|
 				gm_while	|
 				gm_fnc	 	|
-				gm_idop		"LEXSEMI"
-gm_if		->	'LEXIF'		gm_expr		"LEXLB"		gm_stmts	"LEXRB"
+				gm_read		|
+				gm_asn
+gm_if		->	'LEXIF'		'LEXLP'		gm_expr		'LEXRP'		'LEXLB'		gm_stmts	'LEXRB'
 				[ gm_else ]
-gm_else		->	'LEXELSE'	"LEXLB"		gm_stmts	"LEXRB"
-gm_while	->	'LEXWHILE'	gm_expr		"LEXLB"		gm_stmts	"LEXRB"
+gm_else		->	'LEXELSE'	'LEXLB'		gm_stmts	'LEXRB'
+gm_while	->	'LEXWHILE'	gm_expr		'LEXLB'		gm_stmts	'LEXRB'
 gm_fnc		->	'LEXFNC'	gm_expr
-gm_idop		->	"LEXID"		gm_ari
+gm_read		->	'LEXREAD'	gm_expr
+gm_asn		->	'LEXID'		gm_ari		'LEXSEMI'
 
 Expressions:
 gm_expr		->	gm_cmp		[ 'LEXLOGOP'	gm_cmp ]*
@@ -26,5 +28,6 @@ gm_cmp		->	gm_ari		[ 'LEXCMPOP'	gm_ari ]*
 gm_ari		->	gm_term		[ 'LEXARIOP'	gm_term ]*
 gm_term		->	'LEXID'		|
 				'LEXTYPE'	|
+				'LEXNUM'	|
 				'LEXLP'		gm_expr		'LEXRP'
 

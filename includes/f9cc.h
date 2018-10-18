@@ -11,6 +11,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define	DEBUG		0
 
 /* Lexical token types */
 
@@ -46,10 +49,10 @@
 
 #define	CHAR_RANGE		257		/* Range of character values: 0 to 255	*/
 								/* 	plus one for "EOF"					*/
-#define	EOF_CHAR		256
-#define	TAB				6
-#define	NEWLINE			12
-#define	BLANK			32
+#define	EOF_CHAR		'\0'
+#define	TAB				'\t'
+#define	NEWLINE			'\n'
+#define	BLANK			' '
 
 /* FSM actions */
 
@@ -62,7 +65,9 @@
 							/*	integer value if LEXNUM)				*/
 #define	FSM_ACT_SRET	4	/* Save and return.  Used with single-		*/
 							/*	character token, such as comma			*/
-#define	FSM_ACT_ERR		5	/* Invalid combination of state and			*/
+#define FSM_ACT_ARET    5   /* Append and return,  Used with multi-		*/
+							/*  character token, such as +=				*/
+#define	FSM_ACT_ERR		6	/* Invalid combination of state and			*/
 							/*	input character							*/
 
 /* Globals shared by lexical analyzer and parser */

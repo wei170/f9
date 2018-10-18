@@ -64,7 +64,7 @@ SLASH
 
 	/* Starting with a slash */
 
-	any			INIT			RET			LEXUNUSED
+	any			INIT			RET			LEXARIOP
 	'='			ARIEQU			APP			LEXARIOP
 	'*'			INCMT			SKIP		LEXUNUSED
 	'/'			LINECMT			SKIP		LEXUNUSED
@@ -191,7 +191,7 @@ STR
 
 	any			STR				APP			LEXUNUSED
 	'\\'		STRESC			APP			LEXUNUSED
-	'"'			INIT			RET			LEXSTR
+	'"'			INIT			ARET		LEXSTR
 	NEWLINE		INIT			ERR			LEXUNUSED
 	'\0'		INIT			ERR			LEXUNUSED
 

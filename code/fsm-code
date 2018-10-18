@@ -137,7 +137,7 @@
 	for (c = 0; c <= CHAR_RANGE; c++) {
 		fsm[FSM_STATE_SLASH][c].fsm_nextst = FSM_STATE_INIT;
 		fsm[FSM_STATE_SLASH][c].fsm_action = FSM_ACT_RET;
-		fsm[FSM_STATE_SLASH][c].fsm_lextyp = LEXUNUSED;
+		fsm[FSM_STATE_SLASH][c].fsm_lextyp = LEXARIOP;
 	}
 	fsm[FSM_STATE_SLASH]['='].fsm_nextst = FSM_STATE_ARIEQU;
 	fsm[FSM_STATE_SLASH]['='].fsm_action = FSM_ACT_APP;
@@ -466,7 +466,7 @@
 	fsm[FSM_STATE_STR]['\\'].fsm_action = FSM_ACT_APP;
 	fsm[FSM_STATE_STR]['\\'].fsm_lextyp = LEXUNUSED;
 	fsm[FSM_STATE_STR]['"'].fsm_nextst = FSM_STATE_INIT;
-	fsm[FSM_STATE_STR]['"'].fsm_action = FSM_ACT_RET;
+	fsm[FSM_STATE_STR]['"'].fsm_action = FSM_ACT_ARET;
 	fsm[FSM_STATE_STR]['"'].fsm_lextyp = LEXSTR;
 	fsm[FSM_STATE_STR][NEWLINE].fsm_nextst = FSM_STATE_INIT;
 	fsm[FSM_STATE_STR][NEWLINE].fsm_action = FSM_ACT_ERR;

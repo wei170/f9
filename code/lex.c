@@ -163,7 +163,18 @@ void	gettoken(void) {
 				getch();
 				return;
 
+			case FSM_ACT_ARET:
+				if (toklen >= MAXTOK-1) {
+					errmsg("Token is too long");
+				}
+				nexttok.tok_str[toklen++] = ch;
+				nexttok.tok_str[toklen] = '\0';
+				nexttok.tok_typ = fsmptr->fsm_lextyp;
+				getch();
+				return;
+
 			case FSM_ACT_ERR:
+				printf("tok: %d, char: %c\n", nexttok.tok_typ, (char) nextchar);
 				errmsg("Invalid input (not a valid token)");
 		}
 
@@ -182,6 +193,8 @@ void	lookup(void) {
 
 	int	k;		/* Index in the keyword table		*/
 	int	nkeys;	/* Number of keywords in the table	*/
+
+	nexttok.tok_typ = LEXID; /* Default LEX type	*/
 
 	nkeys = sizeof(ktab)/sizeof(struct keyentry);
 
