@@ -70,12 +70,17 @@
 #define	FSM_ACT_ERR		6	/* Invalid combination of state and			*/
 							/*	input character							*/
 
+/* Symbol types */
+#define	SYMERR			0	/* Not recoganized symbol type				*/
+#define	SYMINT			1	/* 'int'									*/
+
 /* Globals shared by lexical analyzer and parser */
 
 #define	MAXTOK		1024	/* Maximum size of a token (possibly a string)	*/
-#define	MAXVAR		24		/* Maximum variable name length					*/
+#define	MAXNAME		24		/* Maximum variable name length					*/
 #define	MAXINT		0x7fffffff  /* Maximum positive integer					*/
 #define	MAXARGS		200		/* Maximum arguments to a function				*/
+#define	MAXSYM		1024	/* Maximum symbols in the entire program		*/
 
 /****************************/
 /*							*/
@@ -105,9 +110,15 @@ struct	keyentry {          /* Keyword table                                */
 };
 
 struct	fsmentry {          /* FSM Entry                                    */
-	int	fsm_nextst;			/* Next state								    */
-	int	fsm_action;			/* Action for this transition				    */
-	int	fsm_lextyp;			/* For FSM_RET, the token type to return	    */
+	int		fsm_nextst;		/* Next state								    */
+	int		fsm_action;		/* Action for this transition				    */
+	int		fsm_lextyp;		/* For FSM_RET, the token type to return	    */
+};
+
+struct symentry {			/* Symbol Entry									*/
+	char	sym_name[MAXNAME]; /* Name of the symbol						*/
+	int		sym_type;		/* Type of the symbol, ie. int					*/
+	int		sym_size;		/* Size											*/
 };
 
 /****************************/
@@ -127,6 +138,10 @@ extern	struct position	pos;			/* Postion for the nextchar			*/
 extern  struct fsmentry fsm[STATES][CHAR_RANGE];
 
 extern  struct keyentry ktab[8];
+
+extern	struct symentry	symtab[MAXSYM];	/* The symbol table					*/
+
+extern	int				nsyms;			/* Numbers of symbol in the table	*/
 
 /****************************/
 /*							*/
@@ -148,7 +163,10 @@ extern	void	getch(void);
 /* in file parser.c */
 extern	void	parser(void);
 
-// extern	int	symlookup(char *);
+/* in file symbol.c */
+extern	int		addsym(char *, int, int);
+extern	int		symlookup(char *);
+extern	int		symtypelookup(char *);
 
 #endif
 

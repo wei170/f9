@@ -4,6 +4,8 @@
  */
 #include <f9cc.h>
 
+
+
 static	void	match		(int, char *);
 static	void	program		(void);
 static	void	parsepgm	(void);
@@ -53,9 +55,18 @@ void parsepgm() {
 
 void parsedecls() {
 	while (nexttok.tok_typ == LEXTYPE) {
+		int symtype = symtypelookup(nexttok.tok_str);
+		if (symtype == SYMERR) {
+			errmsg("expecting a valid type, i.e int");
+			exit(1);
+		}
 		// TODO: support ,
 		gettoken();
 		match(LEXID, "expecting identifier");
+		/* Add the identifier into the table */
+		if (!addsym(nexttok.tok_str, symtype, sizeof(nexttok.tok_str))) {
+			errmsg("identifier already exists");
+		}
 		gettoken();
 		match(LEXSEMI, "expecting semicolon");
 		gettoken();
@@ -196,6 +207,10 @@ void parseread() {
 
 void parseasn() {
 	match(LEXID, "expecting a identifier");
+	if (symlookup(nexttok.tok_str) == -1) {
+		errmsg("the identifer has not been declared");
+		exit(1);
+	}
 
 	gettoken();
 	match(LEXARIOP, "expecting a ari operation");
