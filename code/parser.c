@@ -192,7 +192,13 @@ void parsefnc(char *fname) {
 			if (argcnt >= MAXARGS) {
 				errmsg("too many args to print");
 			}
-			parseexpr();
+
+			if (nexttok.tok_typ == LEXSTR) {
+				gettoken();
+			} else {
+				parseexpr();
+			}
+
 			if (nexttok.tok_typ == LEXCOMMA) {
 				gettoken();
 			} else {
@@ -215,10 +221,13 @@ void parseread() {
 
 	moreargs = 1;
 	argcnt = 0;
+	gettoken();
 	while (moreargs > 0) {
 		argcnt++;
 		match(LEXID, "expecting a identifier in the first argument of read");
+
 		varindex = symlookup(nexttok.tok_str);
+
 		gettoken();
 		if (nexttok.tok_typ == LEXCOMMA) {
 			gettoken();
@@ -249,10 +258,13 @@ void parseasn() {
 	strcpy(tmptok, nexttok.tok_str);
 
 	gettoken();
-	parseexpr();
-
-	match(LEXSEMI, "expecting a semicolon");
-	gettoken();
+	if (nexttok.tok_typ == LEXREAD) {
+		parseread();
+	} else {
+		parseexpr();
+		match(LEXSEMI, "expecting a semicolon");
+		gettoken();
+	}
 }
 
 void parseexpr() {
@@ -289,14 +301,6 @@ void parseterm() {
 		gettoken();
 	} else if (nexttok.tok_typ == LEXNUM) {
 		gettoken();
-	} else if (nexttok.tok_typ == LEXSTR) {
-		gettoken();
-	} else if (nexttok.tok_typ == LEXFCN) {
-		char fname[MAXTOK];
-		strcpy(fname, nexttok.tok_str);
-		parsefnc(fname);
-	} else if (nexttok.tok_typ == LEXREAD) {
-		parseread();
 	} else if (nexttok.tok_typ == LEXLP) {
 		gettoken();
 		parseexpr();
