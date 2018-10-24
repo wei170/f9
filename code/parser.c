@@ -1,10 +1,8 @@
 /**
  *	Parser
- *
+ *	TODO: parsestmts may have a recursion, handle that
  */
 #include <f9cc.h>
-
-
 
 static	void	match		(int, char *);
 static	void	program		(void);
@@ -169,18 +167,38 @@ void parsewhile() {
 }
 
 void parsefnc(char *fname) {
-	// TODO: check if the name exist
 	match(LEXFCN, "expecting a name");
+
+	int moreargs, argcnt;
 
 	gettoken();
 	match(LEXLP, "expecting \'(\'");
 
-	gettoken();
-	parseexpr();
-
-	while (nexttok.tok_typ == LEXCOMMA) {
+	if (strcmp(fname, "exit") == 0) {
+		/* Handle exit */
 		gettoken();
 		parseexpr();
+	} else {
+		/* Handle print */
+		gettoken();
+		if (nexttok.tok_typ == LEXRP) {
+			errmsg("empty list");
+		}
+
+		moreargs = 1;
+		argcnt = 0;
+		while (moreargs > 0) {
+			argcnt++;
+			if (argcnt >= MAXARGS) {
+				errmsg("too many args to print");
+			}
+			parseexpr();
+			if (nexttok.tok_typ == LEXCOMMA) {
+				gettoken();
+			} else {
+				moreargs = 0;
+			}
+		}
 	}
 
 	match(LEXRP, "expecting \')\'");
@@ -190,15 +208,23 @@ void parsefnc(char *fname) {
 void parseread() {
 	match(LEXREAD, "expecting read()");
 
+	int moreargs, argcnt, varindex;
+
 	gettoken();
 	match(LEXLP, "expecting \'(\'");
 
-	gettoken();
-	parseexpr();
-
-	while (nexttok.tok_typ == LEXCOMMA) {
+	moreargs = 1;
+	argcnt = 0;
+	while (moreargs > 0) {
+		argcnt++;
+		match(LEXID, "expecting a identifier in the first argument of read");
+		varindex = symlookup(nexttok.tok_str);
 		gettoken();
-		parseexpr();
+		if (nexttok.tok_typ == LEXCOMMA) {
+			gettoken();
+		} else {
+			moreargs = 0;
+		}
 	}
 
 	match(LEXRP, "expecting \')\'");
@@ -207,7 +233,12 @@ void parseread() {
 
 void parseasn() {
 	match(LEXID, "expecting a identifier");
-	if (symlookup(nexttok.tok_str) == -1) {
+	int symindex;
+	char tmptok[MAXTOK];
+
+	symindex = symlookup(nexttok.tok_str);
+
+	if (symindex == -1) {
 		errmsg("the identifer has not been declared");
 		exit(1);
 	}
@@ -215,15 +246,13 @@ void parseasn() {
 	gettoken();
 	match(LEXARIOP, "expecting a ari operation");
 
+	strcpy(tmptok, nexttok.tok_str);
+
 	gettoken();
 	parseexpr();
 
-	// TODO: if this is correct
-	if (nexttok.tok_typ == LEXSEMI) {
-		gettoken();
-	}
-	// match(LEXSEMI, "expecting a semicolon");
-	// gettoken();
+	match(LEXSEMI, "expecting a semicolon");
+	gettoken();
 }
 
 void parseexpr() {
