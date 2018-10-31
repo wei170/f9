@@ -52,8 +52,9 @@ void parsepgm() {
 }
 
 void parsedecls() {
+	int symtype;
 	while (nexttok.tok_typ == LEXTYPE) {
-		int symtype = symtypelookup(nexttok.tok_str);
+		symtype = symtypelookup(nexttok.tok_str);
 		if (symtype == SYMERR) {
 			errmsg("expecting a valid type, i.e int");
 			exit(1);
@@ -66,6 +67,14 @@ void parsedecls() {
 			errmsg("identifier already exists");
 		}
 		gettoken();
+
+		while (nexttok.tok_typ == LEXCOMMA) {
+			gettoken();
+			match(LEXID, "expecting identifier");
+			symtype = symtypelookup(nexttok.tok_str);
+			addsym(nexttok.tok_str, symtype, sizeof(nexttok.tok_str));
+			gettoken();
+		}
 		match(LEXSEMI, "expecting semicolon");
 		gettoken();
 	}
