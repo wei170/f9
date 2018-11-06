@@ -2,11 +2,10 @@
  * Main
  */
 #include <f9cc.h>
-#include <unistd.h>
-#include <string.h>
 
 struct command	cmd;
 char			nextchar;
+char			err[] = "Save errors into the .tmpf9err\n";
 
 static void usage(int exitcode) {
 		fprintf(exitcode ? stderr : stdout,
@@ -18,21 +17,22 @@ static void usage(int exitcode) {
 }
 
 static void parseOpt(int argc, char **argv) {
-	for (;;) {
-		int opt = getopt(argc, argv, "o");
-		if (opt == -1) break;
-		switch(opt) {
+	int		opt;
+
+	while ((opt = getopt(argc, argv, "o:")) != -1) {
+		switch (opt) {
 			case 'o':
-				cmd.outputFile = fopen(optarg, "w");
+				strcpy(cmd.output, optarg);
+				cmd.outputFile = fopen(".tmpf9.c", "w+");
 				break;
 			default:
 				usage(1);
 		}
 	}
 
-	if (optind != argc - 2) usage(1);
+	if (optind != argc - 1) usage(1);
 
-	cmd.inputFile = fopen(argv[optind+1], "r");
+	cmd.inputFile = fopen(argv[optind], "r");
 	if (cmd.inputFile == NULL) {
 		fprintf(stderr, "%s does not exist.\n", argv[optind]);
 		exit(1);
@@ -53,7 +53,20 @@ void    errmsg(char *msg) {
 
 
 int main(int argc, char **argv) {
+	char	syscmd[1024];
+	int		retcode;			/* Return code from 'system' */
+
 	parseOpt(argc, argv);
 	parser();
+
+	fclose(cmd.outputFile);
+
+	/* Run gcc to produce an object flie */
+
+	sprintf(syscmd, "gcc -Wall -Waddress .tmpf9.c -o %s", cmd.output);
+	retcode = system(syscmd);
+	// unlink(".tmpf9.c");
+
+	exit(0);
 }
 

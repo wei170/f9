@@ -2,7 +2,14 @@
 
 struct position	pos;
 
-void getch(void) {
+/************************************************************************/
+/*																		*/
+/*	getch  --  get the next character									*/
+/*																		*/
+/************************************************************************/
+
+void getch(void)
+{
 
 	/* Check opened input file */
 

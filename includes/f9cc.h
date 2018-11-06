@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define	DEBUG		0
 
@@ -97,6 +98,7 @@ struct	tok {				/* A token as returned by the lexical analyzer	*/
 struct	command {
 	FILE	*inputFile;		/* Input file									*/
 	FILE	*outputFile; 	/* Output file									*/
+	char	output[1024];	/* Output file name								*/
 };
 
 struct	position {			/* Position of the next character				*/

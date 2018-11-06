@@ -27,4 +27,4 @@ symbol.o:	$(CODEDIR)/symbol.c
 		gcc $(FLAGS) -I$(INCDIR) -c $(CODEDIR)/symbol.c -o $(BINDIR)/symbol.o
 
 clean:
-	    rm -f $(BINDIR)/*.o $(PROGRAM)
+	    rm -f $(BINDIR)/* $(PROGRAM) ./.*.c
