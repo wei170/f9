@@ -77,6 +77,12 @@
 	fsm[FSM_STATE_INIT]['}'].fsm_nextst = FSM_STATE_INIT;
 	fsm[FSM_STATE_INIT]['}'].fsm_action = FSM_ACT_SRET;
 	fsm[FSM_STATE_INIT]['}'].fsm_lextyp = LEXRB;
+	fsm[FSM_STATE_INIT]['['].fsm_nextst = FSM_STATE_INIT;
+	fsm[FSM_STATE_INIT]['['].fsm_action = FSM_ACT_SRET;
+	fsm[FSM_STATE_INIT]['['].fsm_lextyp = LEXLBK;
+	fsm[FSM_STATE_INIT][']'].fsm_nextst = FSM_STATE_INIT;
+	fsm[FSM_STATE_INIT][']'].fsm_action = FSM_ACT_SRET;
+	fsm[FSM_STATE_INIT][']'].fsm_lextyp = LEXRBK;
 	fsm[FSM_STATE_INIT][';'].fsm_nextst = FSM_STATE_INIT;
 	fsm[FSM_STATE_INIT][';'].fsm_action = FSM_ACT_SRET;
 	fsm[FSM_STATE_INIT][';'].fsm_lextyp = LEXSEMI;
@@ -382,9 +388,9 @@
 		fsm[FSM_STATE_NAME][c].fsm_action = FSM_ACT_RET;
 		fsm[FSM_STATE_NAME][c].fsm_lextyp = LEXNAME;
 	}
-	fsm[FSM_STATE_NAME]['-'].fsm_nextst = FSM_STATE_NAME;
-	fsm[FSM_STATE_NAME]['-'].fsm_action = FSM_ACT_APP;
-	fsm[FSM_STATE_NAME]['-'].fsm_lextyp = LEXNAME;
+	fsm[FSM_STATE_NAME]['_'].fsm_nextst = FSM_STATE_NAME;
+	fsm[FSM_STATE_NAME]['_'].fsm_action = FSM_ACT_APP;
+	fsm[FSM_STATE_NAME]['_'].fsm_lextyp = LEXNAME;
 	for (c = 'a'; c <= 'z'; c++) {
 		fsm[FSM_STATE_NAME][c].fsm_nextst = FSM_STATE_NAME;
 		fsm[FSM_STATE_NAME][c].fsm_action = FSM_ACT_APP;

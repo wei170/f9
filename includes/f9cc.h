@@ -34,13 +34,15 @@
 #define	LEXRP		14		/* Right parenthesis							*/
 #define	LEXLB		15      /* Left Brace									*/
 #define	LEXRB		16      /* Right Brace									*/
-#define	LEXCMPOP	17		/* Camparison operation							*/
-#define	LEXARIOP	18		/* Arithmetic operation							*/
-#define	LEXLOGOP	19		/* Logic operation								*/
-#define	LEXSEMI		20		/* Semicolon									*/
-#define	LEXCOMMA	21		/* Comma										*/
-#define	LEXSTR		22		/* Strings										*/
-#define	LEXEOF		23		/* End of file									*/
+#define	LEXLBK		17		/* Left Bracket									*/
+#define	LEXRBK		18		/* Right Bracket								*/
+#define	LEXCMPOP	19		/* Camparison operation							*/
+#define	LEXARIOP	20		/* Arithmetic operation							*/
+#define	LEXLOGOP	21		/* Logic operation								*/
+#define	LEXSEMI		22		/* Semicolon									*/
+#define	LEXCOMMA	23		/* Comma										*/
+#define	LEXSTR		24		/* Strings										*/
+#define	LEXEOF		25		/* End of file									*/
 
 /* Declarations for the FSM */
 
@@ -74,6 +76,7 @@
 /* Symbol types */
 #define	SYMERR			0	/* Not recoganized symbol type				*/
 #define	SYMINT			1	/* 'int'									*/
+#define	SYMSTR			2	/* 'string'									*/
 
 /* Globals shared by lexical analyzer and parser */
 
@@ -139,7 +142,7 @@ extern	struct position	pos;			/* Postion for the nextchar			*/
 
 extern  struct fsmentry fsm[STATES][CHAR_RANGE];
 
-extern  struct keyentry ktab[8];
+extern  struct keyentry ktab[9];
 
 extern	struct symentry	symtab[MAXSYM];	/* The symbol table					*/
 

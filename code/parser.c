@@ -29,6 +29,7 @@ static	void	parseexpr	(void);
 static	void	parsecmp	(void);
 static	void	parseari	(void);
 static	void	parseterm	(void);
+static	void	checkarray	(int);
 
 /************************************************************************/
 /*																		*/
@@ -36,7 +37,7 @@ static	void	parseterm	(void);
 /*																		*/
 /************************************************************************/
 
-void parser() {
+void	parser() {
 	lexinit();
 	gettoken();
 	program();
@@ -49,31 +50,57 @@ void parser() {
 /*																		*/
 /************************************************************************/
 
-void match(int lextype, char *msg) {
+void	match(int lextype, char *msg) {
 	if (nexttok.tok_typ != lextype) {
 		errmsg(msg);
 		exit(1);
 	}
 }
 
-void program() {
+void	checkarray(
+			int symindex
+		)
+{
+	if (nexttok.tok_typ == LEXLBK) {
+		fprintf(cmd.outputFile, "[ ");							/* CODE */
+		gettoken();
+		/* TODO */
+		match(LEXNUM, "expecting an array size");
+
+		/* Parse the array size */
+
+		if (nexttok.tok_val <= 0) {
+			errmsg("invalid array size");
+		}
+		symtab[symindex].sym_size = nexttok.tok_val;
+		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);			/* CODE */
+
+		gettoken();
+		match(LEXRBK, "expecting a right backet");
+		fprintf(cmd.outputFile, "]");							/* CODE */
+
+		gettoken();
+	}
+}
+
+void	program() {
 	parsepgm();
 	match(LEXEOF, "expected EOF");
 }
 
-void parsepgm() {
+void	parsepgm() {
 
 	/* Check the program header */
 
 	match(LEXPGM, "expecting \'program\'");
 
-	fprintf(cmd.outputFile, "#include <stdio.h>\n");		/* CODE */
-	fprintf(cmd.outputFile, "#include <stdlib.h>\n");		/* CODE */
+	fprintf(cmd.outputFile, "#include <stdio.h>\n");			/* CODE */
+	fprintf(cmd.outputFile, "#include <stdlib.h>\n");			/* CODE */
 
 	gettoken();
 	match(LEXLB, "expecting left brace");
 
-	fprintf(cmd.outputFile, "int\tmain(void) {\n");		/* CODE */
+	fprintf(cmd.outputFile, "int\tmain(void) {\n");				/* CODE */
 
 	/* Parse declarations */
 
@@ -93,8 +120,9 @@ void parsepgm() {
 	gettoken();
 }
 
-void parsedecls() {
-	int symtype;
+void	parsedecls() {
+	int symtype;			/* Symbol type for the declaration			*/
+	int	symindex;			/* Index in symbol table					*/
 
 	/* While declarations exist, parse them */
 
@@ -103,11 +131,17 @@ void parsedecls() {
 		/* Lookup the declaration type */
 
 		symtype = symtypelookup(nexttok.tok_str);
-		if (symtype == SYMERR) {
-			errmsg("expecting a valid type, i.e int");
-			exit(1);
+		switch (symtype) {
+			case SYMINT:
+				fprintf(cmd.outputFile, "\t%s ", "int");		/* CODE */
+				break;
+			case SYMSTR:
+				fprintf(cmd.outputFile, "\t%s *", "char");		/* CODE */
+				break;
+			default:
+				errmsg("expecting a valid type, i.e int");
+				exit(1);
 		}
-		fprintf(cmd.outputFile, "\t%s\t", nexttok.tok_str);		/* CODE */
 
 		/* Check the identifier of the declaration */
 
@@ -116,18 +150,27 @@ void parsedecls() {
 
 		/* Add the identifier into the table */
 
-		if (!addsym(nexttok.tok_str, symtype, sizeof(nexttok.tok_str))) {
+		if ((symindex = addsym(nexttok.tok_str, symtype, 0)) == -1) {
 			errmsg("identifier already exists");
 			exit(1);
 		}
 		fprintf(cmd.outputFile, "%s", nexttok.tok_str);			/* CODE */
+		gettoken();
+		checkarray(symindex);
 
 		/* While comma exists, parse the following declarations */
 
-		gettoken();
 		while (nexttok.tok_typ == LEXCOMMA) {
 
-			fprintf(cmd.outputFile, ", ");						/* CODE */
+			/* Create based on its symbol type */
+			switch (symtype) {
+				case SYMINT:
+					fprintf(cmd.outputFile, ", ");				/* CODE */
+					break;
+				case SYMSTR:
+					fprintf(cmd.outputFile, ", *");				/* CODE */
+					break;
+			}
 
 			/* Check the identifier of the declaration */
 
@@ -136,13 +179,13 @@ void parsedecls() {
 
 			/* Add the identifier into the table */
 
-			if (!addsym(nexttok.tok_str, symtype, sizeof(nexttok.tok_str))) {
+			if ((symindex = addsym(nexttok.tok_str, symtype, 0)) == -1) {
 				errmsg("identifier already exists");
 				exit(1);
 			}
 			fprintf(cmd.outputFile, "%s", nexttok.tok_str);		/* CODE */
-
 			gettoken();
+			checkarray(symindex);
 		}
 
 		/* Check the semicolon at the end */
@@ -153,7 +196,7 @@ void parsedecls() {
 	}
 }
 
-void parsestmts() {
+void	parsestmts() {
 	parsestmt();
 
 	while (nexttok.tok_typ != LEXRB) {
@@ -161,7 +204,7 @@ void parsestmts() {
 	}
 }
 
-void parsestmt() {
+void	parsestmt() {
 	char fname[MAXTOK];
 	switch(nexttok.tok_typ) {
 		case LEXIF:
@@ -189,7 +232,7 @@ void parsestmt() {
 	}
 }
 
-void parseif() {
+void	parseif() {
 	match(LEXIF, "expecting \'if\'");
 	fprintf(cmd.outputFile, "\tif ");							/* CODE */
 
@@ -228,7 +271,7 @@ void parseif() {
 	}
 }
 
-void parseelse() {
+void	parseelse() {
 	match(LEXELSE, "expecting \'else\'");
 	fprintf(cmd.outputFile, "\telse ");							/* CODE */
 
@@ -245,7 +288,7 @@ void parseelse() {
 	gettoken();
 }
 
-void parsewhile() {
+void	parsewhile() {
 	match(LEXWHILE, "expecting \'while\'");
 	fprintf(cmd.outputFile, "\twhile ");						/* CODE */
 
@@ -276,10 +319,10 @@ void parsewhile() {
 	gettoken();
 }
 
-void parsefnc(char *fname) {
+void	parsefnc(char *fname) {
 	match(LEXFCN, "expecting a name");
 
-	int moreargs, argcnt;
+	int moreargs, argcnt, symindex;
 
 	gettoken();
 	match(LEXLP, "expecting \'(\'");
@@ -291,6 +334,7 @@ void parsefnc(char *fname) {
 		parseexpr();
 	} else {
 		/* Handle print */
+		// TODO: generate the variables printf("%d%s%d%d", tmp1, tmp2, tmp3, tmp4)
 		gettoken();
 		if (nexttok.tok_typ == LEXRP) {
 			errmsg("empty list");
@@ -309,8 +353,18 @@ void parsefnc(char *fname) {
 				fprintf(cmd.outputFile, "%s", nexttok.tok_str);	/* CODE */
 				gettoken();
 			} else {
-				fprintf(cmd.outputFile, "\tprintf(\"%%d\",");	/* CODE */
-				parseexpr();
+
+				/* Handle string and array vairables */
+
+				if ((nexttok.tok_typ == LEXID)
+						&& ((symindex=symlookup(nexttok.tok_str)) != -1)
+						&& (symtab[symindex].sym_type == SYMSTR)) {
+					fprintf(cmd.outputFile, "\tprintf(\"%%s\", "); /* CODE */
+					parseexpr();
+				} else {
+					fprintf(cmd.outputFile, "\tprintf(\"%%d\", "); /* CODE */
+					parseexpr();
+				}
 			}
 
 			if (nexttok.tok_typ == LEXCOMMA) {
@@ -328,7 +382,7 @@ void parsefnc(char *fname) {
 	gettoken();
 }
 
-void parseread() {
+void	parseread() {
 	match(LEXREAD, "expecting read()");
 
 	int moreargs, argcnt, varindex;
@@ -367,7 +421,7 @@ void parseread() {
 	gettoken();
 }
 
-void parseasn() {
+void	parseasn() {
 	match(LEXID, "expecting a identifier");
 
 	int symindex;
@@ -379,16 +433,49 @@ void parseasn() {
 		exit(1);
 	}
 	fprintf(cmd.outputFile, "\t%s ", nexttok.tok_str);			/* CODE */
-
-	strcpy(tmptok, nexttok.tok_str);
-
 	gettoken();
+
+	/* Check if the vairable is an array */
+
+	if (nexttok.tok_typ == LEXLBK) {
+		fprintf(cmd.outputFile, "[ ");							/* CODE */
+		if (symtab[symindex].sym_size <= 0) {
+			errmsg("attempt to index a non-array variable");
+		}
+		gettoken();
+		parseexpr();
+		match(LEXRBK, "expecting a right backet");
+		fprintf(cmd.outputFile, "]");							/* CODE */
+		gettoken();
+	}
+
 	match(LEXARIOP, "expecting a arithmetic operation");
 	fprintf(cmd.outputFile, "%s ", nexttok.tok_str);			/* CODE */
 
+	/* Store the arithmetic operation */
+	strcpy(tmptok, nexttok.tok_str);
+
 	gettoken();
 	if (nexttok.tok_typ == LEXREAD) {
+		if (strcmp(tmptok, "=") != 0) {
+			errmsg("read requires assignment operator =");
+		}
 		parseread();
+	} else if (nexttok.tok_typ == LEXSTR) {
+		if (symtab[symindex].sym_type != SYMSTR) {
+			errmsg("attempt to assgin a string to a non-string variable");
+		}
+
+		if (strcmp(tmptok, "=") != 0) {
+			errmsg("string assignment requires operator =");
+		}
+		fprintf(cmd.outputFile, "%s", nexttok.tok_str);			/* CODE */
+
+		gettoken();
+		match(LEXSEMI, "expecting a semicolon");
+		fprintf(cmd.outputFile, ";\n");							/* CODE */
+
+		gettoken();
 	} else {
 		parseexpr();
 		match(LEXSEMI, "expecting a semicolon");
@@ -398,7 +485,7 @@ void parseasn() {
 	fprintf(cmd.outputFile, ";\n");								/* CODE */
 }
 
-void parseexpr() {
+void	parseexpr() {
 	parsecmp();
 
 	while (nexttok.tok_typ == LEXLOGOP) {
@@ -409,7 +496,7 @@ void parseexpr() {
 	}
 }
 
-void parsecmp() {
+void	parsecmp() {
 	parseari();
 
 	while (nexttok.tok_typ == LEXCMPOP) {
@@ -420,7 +507,7 @@ void parsecmp() {
 	}
 }
 
-void parseari() {
+void	parseari() {
 	parseterm();
 
 	while (nexttok.tok_typ == LEXARIOP) {
@@ -431,10 +518,33 @@ void parseari() {
 	}
 }
 
-void parseterm() {
+void	parseterm() {
+	int	symindex;		/* Index of variable in symbol table			*/
 	if (nexttok.tok_typ == LEXID) {
+		symindex = symlookup(nexttok.tok_str);
+		if (symindex == -1) {
+			printf("token string: %s\n", nexttok.tok_str);
+			errmsg("the identifier is not declared");
+			exit(1);
+		}
+
 		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);		/* CODE */
 		gettoken();
+
+		/* Handle if the variable is an array */
+		if (nexttok.tok_typ == LEXLBK) {
+			if (symtab[symindex].sym_size == 0) {
+				errmsg("array reference to non-array");
+			}
+			fprintf(cmd.outputFile, "[ ");						/* CODE */
+			gettoken();
+			parseexpr();
+			match(LEXRBK, "expecting a right bracket");
+
+			fprintf(cmd.outputFile, "]");						/* CODE */
+			gettoken();
+		}
+
 	} else if (nexttok.tok_typ == LEXTYPE) {
 		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);		/* CODE */
 		gettoken();

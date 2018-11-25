@@ -6,7 +6,7 @@ struct symentry	symtab[MAXSYM];	/* The symbol table	*/
 
 /**
  * Add a new symbol into the symtab
- * @return: 0 if it exists | 1 if successfully added
+ * @return: -1 if it exists | index if successfully added
  */
 int addsym(
 		char *name,
@@ -15,13 +15,13 @@ int addsym(
 		)
 {
 	/* The name has already existed in the table */
-	if (symlookup(name) != -1) return 0;
+	if (symlookup(name) != -1) return -1;
 
 	struct symentry *nextsym = &symtab[nsyms++];
 	strcpy(nextsym->sym_name, name);
 	nextsym->sym_type = type;
 	nextsym->sym_size = size;
-	return 1;
+	return (nsyms - 1);
 }
 
 /**
@@ -45,5 +45,6 @@ int symtypelookup(
 		)
 {
 	if (strcmp(type, "int") == 0) return SYMINT;
+	else if (strcmp(type, "str") == 0) return SYMSTR;
 	else return SYMERR;
 }

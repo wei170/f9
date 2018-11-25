@@ -35,6 +35,8 @@ INIT
 	')'			INIT			SRET		LEXRP
 	'{'			INIT			SRET		LEXLB
 	'}'			INIT			SRET		LEXRB
+	'['			INIT			SRET		LEXLBK
+	']'			INIT			SRET		LEXRBK
 	';'			INIT			SRET		LEXSEMI
 	','			INIT			SRET		LEXCOMMA
 
@@ -160,7 +162,7 @@ NAME
 	/* Have seen a letter */
 
 	any			INIT			RET			LEXNAME
-	'-'			NAME			APP			LEXNAME
+	'_'			NAME			APP			LEXNAME
 	a-z			NAME			APP			LEXNAME
 	A-Z			NAME			APP			LEXNAME
 	0-9			NAME			APP			LEXNAME

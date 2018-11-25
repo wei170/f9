@@ -24,14 +24,15 @@ struct tok	nexttok;			/* The next input token. Set by lexan	*/
 int			toklen;				/* Length of the token					*/
 
 struct	keyentry ktab[] = {     /* Declaration of the keyword table     */
-	{ "int",     LEXTYPE },
-	{ "if",      LEXIF   },
-	{ "else",    LEXELSE },
-	{ "while",   LEXWHILE},
-	{ "program", LEXPGM  },
-	{ "read",    LEXREAD },
-	{ "print",   LEXFCN  },
-	{ "exit",    LEXFCN  }
+	{ "int",		LEXTYPE },
+	{ "str",		LEXTYPE },
+	{ "if",			LEXIF   },
+	{ "else",		LEXELSE },
+	{ "while",		LEXWHILE},
+	{ "program",	LEXPGM  },
+	{ "read",		LEXREAD },
+	{ "print",		LEXFCN  },
+	{ "exit",		LEXFCN  }
 };
 
 struct	fsmentry fsm[STATES][CHAR_RANGE]; /* One entry in the FSM array */
