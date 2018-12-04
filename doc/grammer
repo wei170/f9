@@ -1,33 +1,50 @@
-Grammer
+# Grammer
 
-Rules
+## Rules
 
-Program:
+### Program:
+
 program		->	gm_pgm		'LEXEOF'
-gm_pgm		->	'LEXPRG'	'LEXLB'			gm_decls	gm_stmts	'LEXRB'
-gm_decls	->	[ 'LEXTYPE'	'LEXID'			[ ',', 'LEXID' ]*  ]*
 
-Statements:
+gm_pgm		->	'LEXPRG'	'LEXLB'			gm_decls	gm_stmts	'LEXRB'
+
+gm_decls	->	[ 'LEXTYPE'	gm_var			[ 'LEXCOMMA' gm_var ]*	'LEXSEMI'  ]*
+
+gm_var		->	'LEXID'		[ 'LEXLBK' 'LEXNUM' 'LEXRBK' ]
+
+### Statements:
+
 gm_stmts	->	gm_stmt		[ gm_stmt ]*
+
 gm_stmt		->	gm_if		|
 				gm_while	|
 				gm_fnc	 	|
-				gm_read		|
-				gm_asn
+				gm_asn		|
+				error
+
 gm_if		->	'LEXIF'		'LEXLP'		gm_expr		'LEXRP'		'LEXLB'		gm_stmts	'LEXRB'
 				[ gm_else ]
-gm_else		->	'LEXELSE'	'LEXLB'		gm_stmts	'LEXRB'
-gm_while	->	'LEXWHILE'	gm_expr		'LEXLB'		gm_stmts	'LEXRB'
-gm_fnc		->	'LEXFNC'	gm_expr
-gm_read		->	'LEXREAD'	gm_expr
-gm_asn		->	'LEXID'		gm_ari		'LEXSEMI'
 
-Expressions:
-gm_expr		->	gm_cmp		[ 'LEXLOGOP'	gm_cmp ]*
-gm_cmp		->	gm_ari		[ 'LEXCMPOP'	gm_ari ]*
-gm_ari		->	gm_term		[ 'LEXARIOP'	gm_term ]*
-gm_term		->	'LEXID'		|
-				'LEXTYPE'	|
+gm_else		->	'LEXELSE'	'LEXLB'		gm_stmts	'LEXRB'
+
+gm_while	->	'LEXWHILE'	gm_expr		'LEXLB'		gm_stmts	'LEXRB'
+
+gm_asn		->	'LEXID'		gm_read		|
+				'LEXID'		gm_expr		'LEXSEMI'
+
+gm_read		->	'LEXLP'		gm_var		[ 'LEXCOMMA' gm_var ]*	'LEXRP'
+
+gm_fnc		->	'exit'		'LEXLP'		gm_expr		'LEXRP'		|
+				'print'		'LEXLP'		gm_expr		[ 'LEXCOMMA' gm_expr ]*	'LEXRP'
+
+### Expressions:
+gm_expr		->	gm_cmp		[ 'LEXLOGOP'	gm_cmp ]*	// Reminder: logop is || or &&
+
+gm_cmp		->	gm_ari		[ 'LEXCMPOP'	gm_ari ]*	// Reminder: cmpop is < <= > >= == or !=
+
+gm_ari		->	gm_term		[ 'LEXARIOP'	gm_term ]*	// Reminder: ariop is + - * or /
+
+gm_term		->	gm_var		|
 				'LEXNUM'	|
 				'LEXLP'		gm_expr		'LEXRP'
 
