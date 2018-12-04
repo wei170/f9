@@ -42,7 +42,8 @@
 #define	LEXSEMI		22		/* Semicolon									*/
 #define	LEXCOMMA	23		/* Comma										*/
 #define	LEXSTR		24		/* Strings										*/
-#define	LEXEOF		25		/* End of file									*/
+#define	LEXBOOL		25		/* Boolean macros								*/
+#define	LEXEOF		26		/* End of file									*/
 
 /* Declarations for the FSM */
 
@@ -77,6 +78,7 @@
 #define	SYMERR			0	/* Not recoganized symbol type				*/
 #define	SYMINT			1	/* 'int'									*/
 #define	SYMSTR			2	/* 'string'									*/
+#define	SYMBOOL			3	/* 'boolean'									*/
 
 /* Globals shared by lexical analyzer and parser */
 
@@ -142,7 +144,7 @@ extern	struct position	pos;			/* Postion for the nextchar			*/
 
 extern  struct fsmentry fsm[STATES][CHAR_RANGE];
 
-extern  struct keyentry ktab[9];
+extern  struct keyentry ktab[12];
 
 extern	struct symentry	symtab[MAXSYM];	/* The symbol table					*/
 

@@ -64,7 +64,6 @@ void	checkarray(
 	if (nexttok.tok_typ == LEXLBK) {
 		fprintf(cmd.outputFile, "[ ");							/* CODE */
 		gettoken();
-		/* TODO */
 		match(LEXNUM, "expecting an array size");
 
 		/* Parse the array size */
@@ -77,7 +76,7 @@ void	checkarray(
 
 		gettoken();
 		match(LEXRBK, "expecting a right backet");
-		fprintf(cmd.outputFile, "]");							/* CODE */
+		fprintf(cmd.outputFile, "] ");							/* CODE */
 
 		gettoken();
 	}
@@ -96,6 +95,12 @@ void	parsepgm() {
 
 	fprintf(cmd.outputFile, "#include <stdio.h>\n");			/* CODE */
 	fprintf(cmd.outputFile, "#include <stdlib.h>\n");			/* CODE */
+
+	/* TODO: Import macros from a file */
+	fprintf(cmd.outputFile, "#define TRUE\t1\n");			/* CODE */
+	fprintf(cmd.outputFile, "#define FALSE\t0\n");			/* CODE */
+	/* addsym("TRUE", LEXBOOL, 0); */
+	/* addsym("FALSE", LEXBOOL, 0); */
 
 	gettoken();
 	match(LEXLB, "expecting left brace");
@@ -132,6 +137,7 @@ void	parsedecls() {
 
 		symtype = symtypelookup(nexttok.tok_str);
 		switch (symtype) {
+			case SYMBOOL:	/* Fall through */
 			case SYMINT:
 				fprintf(cmd.outputFile, "\t%s ", "int");		/* CODE */
 				break;
@@ -164,7 +170,8 @@ void	parsedecls() {
 
 			/* Create based on its symbol type */
 			switch (symtype) {
-				case SYMINT:
+				case SYMINT:	/* Fall through */
+				case SYMBOOL:
 					fprintf(cmd.outputFile, ", ");				/* CODE */
 					break;
 				case SYMSTR:
@@ -445,7 +452,7 @@ void	parseasn() {
 		gettoken();
 		parseexpr();
 		match(LEXRBK, "expecting a right backet");
-		fprintf(cmd.outputFile, "]");							/* CODE */
+		fprintf(cmd.outputFile, "] ");							/* CODE */
 		gettoken();
 	}
 
@@ -463,7 +470,7 @@ void	parseasn() {
 		parseread();
 	} else if (nexttok.tok_typ == LEXSTR) {
 		if (symtab[symindex].sym_type != SYMSTR) {
-			errmsg("attempt to assgin a string to a non-string variable");
+			errmsg("attempt to assign a string to a non-string variable");
 		}
 
 		if (strcmp(tmptok, "=") != 0) {
@@ -473,7 +480,6 @@ void	parseasn() {
 
 		gettoken();
 		match(LEXSEMI, "expecting a semicolon");
-		fprintf(cmd.outputFile, ";\n");							/* CODE */
 
 		gettoken();
 	} else {
@@ -541,7 +547,7 @@ void	parseterm() {
 			parseexpr();
 			match(LEXRBK, "expecting a right bracket");
 
-			fprintf(cmd.outputFile, "]");						/* CODE */
+			fprintf(cmd.outputFile, "] ");						/* CODE */
 			gettoken();
 		}
 
@@ -549,6 +555,9 @@ void	parseterm() {
 		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);		/* CODE */
 		gettoken();
 	} else if (nexttok.tok_typ == LEXNUM) {
+		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);		/* CODE */
+		gettoken();
+	} else if (nexttok.tok_typ == LEXBOOL) {
 		fprintf(cmd.outputFile, "%s ", nexttok.tok_str);		/* CODE */
 		gettoken();
 	} else if (nexttok.tok_typ == LEXLP) {

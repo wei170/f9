@@ -26,6 +26,9 @@ int			toklen;				/* Length of the token					*/
 struct	keyentry ktab[] = {     /* Declaration of the keyword table     */
 	{ "int",		LEXTYPE },
 	{ "str",		LEXTYPE },
+	{ "bool",		LEXTYPE	},
+	{ "TRUE",		LEXBOOL	},
+	{ "FALSE",		LEXBOOL	},
 	{ "if",			LEXIF   },
 	{ "else",		LEXELSE },
 	{ "while",		LEXWHILE},

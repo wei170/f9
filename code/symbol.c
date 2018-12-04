@@ -46,5 +46,6 @@ int symtypelookup(
 {
 	if (strcmp(type, "int") == 0) return SYMINT;
 	else if (strcmp(type, "str") == 0) return SYMSTR;
+	else if (strcmp(type, "bool") == 0) return SYMBOOL;
 	else return SYMERR;
 }
