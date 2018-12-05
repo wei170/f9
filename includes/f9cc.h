@@ -87,6 +87,7 @@
 #define	MAXINT		0x7fffffff  /* Maximum positive integer					*/
 #define	MAXARGS		200		/* Maximum arguments to a function				*/
 #define	MAXSYM		1024	/* Maximum symbols in the entire program		*/
+#define	MAXFRAME	512
 
 /****************************/
 /*							*/
@@ -103,7 +104,7 @@ struct	tok {				/* A token as returned by the lexical analyzer	*/
 struct	command {
 	FILE	*inputFile;		/* Input file									*/
 	FILE	*outputFile; 	/* Output file									*/
-	char	output[1024];	/* Output file name								*/
+	char	output[MAXFRAME];	/* Output file name							*/
 };
 
 struct	position {			/* Position of the next character				*/

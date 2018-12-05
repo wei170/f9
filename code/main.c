@@ -18,12 +18,13 @@ static void usage(int exitcode) {
 
 static void parseOpt(int argc, char **argv) {
 	int		opt;
+	char	filename[MAXFRAME];
+	int		l;
 
 	while ((opt = getopt(argc, argv, "o:")) != -1) {
 		switch (opt) {
 			case 'o':
 				strcpy(cmd.output, optarg);
-				cmd.outputFile = fopen(".tmpf9.c", "w+");
 				break;
 			default:
 				usage(1);
@@ -32,10 +33,30 @@ static void parseOpt(int argc, char **argv) {
 
 	if (optind != argc - 1) usage(1);
 
-	cmd.inputFile = fopen(argv[optind], "r");
+	/* Open the input file */
+	l = strlen(argv[optind]);
+	if (l >= MAXFRAME - 4) {
+		fprintf(stderr, "input file name too long\n");
+		exit(1);
+	}
+	strcpy(filename, argv[optind]);
+	if (strcmp(&filename[l-3], ".f9") != 0) {
+		fprintf(stderr, "File %s does not end up with .f9\n", filename);
+		exit(1);
+	}
+	cmd.inputFile = fopen(filename, "r");
 	if (cmd.inputFile == NULL) {
 		fprintf(stderr, "%s does not exist.\n", argv[optind]);
 		exit(1);
+	}
+
+	/* Open the tmp output file */
+	cmd.outputFile = fopen(".tmpf9.c", "w+");
+
+	/* Parse the output file */
+	if (strlen(cmd.output) == 0) {
+		strcpy(&filename[l-3], "");
+		strcpy(cmd.output, filename);
 	}
 }
 
@@ -65,7 +86,10 @@ int main(int argc, char **argv) {
 
 	sprintf(syscmd, "gcc -Wall -Waddress .tmpf9.c -o %s", cmd.output);
 	retcode = system(syscmd);
-	// unlink(".tmpf9.c");
+
+	#ifndef DEBUG
+	unlink(".tmpf9.c");
+	#endif
 
 	exit(0);
 }
